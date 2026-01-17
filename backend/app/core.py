@@ -37,7 +37,7 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
         List of Course objects required for graduation
     """
     courses = []
-    if major == "Computer Science"
+    if major == "Computer Science":
         # ============== COMMON CURRICULUM (CC) ==============
         # University Pillars
         courses.append(Course("CS1101S", "Programming Methodology", 4, "CC-UP", [], [], ["CS1101", "CS1010"]))
@@ -67,6 +67,7 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
         courses.append(Course("CS2030S", "Programming Methodology II", 4, "Core-CS", ["CS1101S"], [], ["CS2030"]))
         courses.append(Course("CS2040S", "Data Structures and Algorithms", 4, "Core-CS", ["CS1101S", "CS1231S"], [], ["CS2040"]))
         courses.append(Course("CS2100", "Computer Organisation", 4, "Core-CS", ["CS1101S"], [], []))
+        courses.append(Course("CS2101", "Effective Communication for Computing Professionals", 4, "Core-CS", [], ["CS2103T"], []))
         courses.append(Course("CS2103T", "Software Engineering", 4, "Core-CS", ["CS2030S", "CS2040S"], ["CS2101"], []))
         courses.append(Course("CS2106", "Introduction to Operating Systems", 4, "Core-CS", ["CS2100"], [], []))
         courses.append(Course("CS2109S", "Introduction to AI and Machine Learning", 4, "Core-CS", ["CS2040S", "CS1231S", "MA1521"], [], []))
@@ -86,7 +87,7 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
         for i in range(1, 6):
             courses.append(Course(f"UE-{i}", "Unrestricted Elective", 4, "UE", [], [], [], fluff=True))
 
-    elif major == "Business Analytics":
+    if major == "Business Analytics":
         # ============== COMMON CORE (per your JSON) ==============
         courses.append(Course("CS1010A", "Programming Methodology", 4, "CC-UP", [], [], ["CS1101S", "CS1101", "CS1010"]))
         courses.append(Course("GEX", "Critique and Expression (choose any GEX%)", 4, "CC-UP", [], [], [], fluff=True))
@@ -123,6 +124,7 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
         # ============== UNRESTRICTED ELECTIVES (40 units => 10 modules placeholders) ==============
         for i in range(1, 11):
             courses.append(Course(f"UE-{i}", "Unrestricted Elective", 4, "UE", [], [], [], fluff=True))
+
     return courses
 
 

@@ -355,9 +355,10 @@ def assign_to_semesters(
                 for p in course.prereq:
                     p_base = get_base_code(p)
                     satisfied = False
-                    for c in completed:
-                        if get_base_code(c) == p_base:
-                            satisfied = True; break
+                    for s_code, s_idx in scheduled_sem_map.items():
+                        if get_base_code(s_code) == p_base:
+                            if s_idx < sem_idx: # Strict inequality: Prereq must be from earlier sem
+                                satisfied = True; break
                     if not satisfied:
                         prereqs_ok = False; break
             if not prereqs_ok: continue 
@@ -391,9 +392,10 @@ def assign_to_semesters(
                         for cp in coreq.prereq:
                             cp_base = get_base_code(cp)
                             cp_satis = False
-                            for c in completed: 
-                                if get_base_code(c) == cp_base: cp_satis = True; break
-                            if not cp_satis and get_base_code(code) == cp_base: cp_satis = True
+                            for s_code, s_idx in scheduled_sem_map.items(): 
+                                if get_base_code(s_code) == cp_base:
+                                     if s_idx < sem_idx: # Strict inequality
+                                         cp_satis = True; break
                             if not cp_satis: cp_ok = False; break
                     if not cp_ok: coreqs_ok = False; break
 

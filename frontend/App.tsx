@@ -5,8 +5,9 @@ import MainBoard from './components/MainBoard';
 import SidebarRight from './components/SidebarRight';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import NewUserOnboarding from './components/NewUserOnboarding';
 import { AcademicYear } from './types';
-import { GeneratePlanResponse } from './api';
+import { GeneratePlanResponse, fetchUserPlan } from './api';
 
 // Types for Auth
 interface User {
@@ -64,6 +65,8 @@ const App: React.FC = () => {
   // Auth State
   const [user, setUser] = useState<User | null>(null);
   const [authView, setAuthView] = useState<'login' | 'signup'>('login');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [checkingPlan, setCheckingPlan] = useState(false);
 
   // App State
   const [isAiOpen, setIsAiOpen] = useState(false);
@@ -102,6 +105,20 @@ const App: React.FC = () => {
     }
   }, [user]);
 
+  // Check if user has existing plan (for onboarding flow)
+  const checkUserPlan = async (userId: string): Promise<boolean> => {
+    try {
+      setCheckingPlan(true);
+      const planResponse = await fetchUserPlan(userId);
+      return planResponse.exists;
+    } catch (error) {
+      console.error('Error checking user plan:', error);
+      return false; // Assume no plan on error, show onboarding
+    } finally {
+      setCheckingPlan(false);
+    }
+  };
+
   // Auth Handlers
   const handleLogin = async (email: string, password: string): Promise<string> => {
     try {
@@ -114,12 +131,20 @@ const App: React.FC = () => {
       const userData = await response.json();
 
       if (userData.success) {
-        setUser({
+        const newUser = {
           id: userData.id,
           name: userData.name,
           email: userData.email,
           isGuest: false
-        });
+        };
+        setUser(newUser);
+        
+        // Check if user has existing plan
+        const hasPlan = await checkUserPlan(userData.id);
+        if (!hasPlan) {
+          setShowOnboarding(true);
+        }
+        
         return ''; // No error
       } else {
         return userData.message || 'Login failed';
@@ -167,12 +192,17 @@ const App: React.FC = () => {
       const userData = await response.json();
 
       if (userData.success) {
-        setUser({
+        const newUser = {
           id: userData.id,
           name: userData.name,
           email: userData.email,
           isGuest: false
-        });
+        };
+        setUser(newUser);
+        
+        // New users always need onboarding (they don't have a plan yet)
+        setShowOnboarding(true);
+        
         return ''; // No error
       } else {
         return userData.message || 'Signup failed';
@@ -203,6 +233,16 @@ const App: React.FC = () => {
 
   const handleExportPlan = () => {
     setExportTrigger(prev => prev + 1);
+  };
+
+  // Onboarding Handlers
+  const handleOnboardingComplete = (plan: GeneratePlanResponse) => {
+    setGeneratedPlan(plan);
+    setShowOnboarding(false);
+  };
+
+  const handleOnboardingSkip = () => {
+    setShowOnboarding(false);
   };
 
   // Handle save success callback from MainBoard
@@ -239,6 +279,29 @@ const App: React.FC = () => {
         />
       );
     }
+  }
+
+  // Show loading while checking if user has a plan
+  if (checkingPlan) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-slate-600 font-medium">Loading your plan...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show onboarding for new users without a plan
+  if (showOnboarding && user.id && !user.isGuest) {
+    return (
+      <NewUserOnboarding
+        userId={user.id}
+        onComplete={handleOnboardingComplete}
+        onSkip={handleOnboardingSkip}
+      />
+    );
   }
 
   // Render Main App if logged in

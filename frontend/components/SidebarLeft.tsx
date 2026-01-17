@@ -32,18 +32,18 @@ const BBA_MAJORS = [
   'Real Estate'
 ];
 
-// SEP semester options (Year 2 Sem 1 to Year 4 Sem 2)
+// SEP semester options (Year 2 Sem 1 to Year 4 Sem 1)
 const SEP_OPTIONS = [
   'Year 2 Semester 1',
   'Year 2 Semester 2',
   'Year 3 Semester 1',
   'Year 3 Semester 2',
-  'Year 4 Semester 1',
-  'Year 4 Semester 2'
+  'Year 4 Semester 1'
 ];
 
 // CS Focus Areas / Specialisations
 const CS_FOCUS_AREAS = [
+  'Algorithms & Theory',
   'Artificial Intelligence',
   'Computer Graphics and Games',
   'Computer Security',
@@ -52,7 +52,8 @@ const CS_FOCUS_AREAS = [
   'Networking and Distributed Systems',
   'Parallel Computing',
   'Programming Languages',
-  'Software Engineering'
+  'Software Engineering',
+  "None/Haven't Decided"
 ];
 
 const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYearChange, onCurrentSemesterChange, initialAcademicYear = '2024/2025', onDegreeChange, onMajorChange }) => {
@@ -99,11 +100,13 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
     onAcademicYearChange?.(newYear);
   };
 
-  // Generate academic year options (current year + 5 years back)
+  // Generate academic year options (current year + 5 years back) in AY format
   const currentYear = new Date().getFullYear();
   const academicYearOptions = Array.from({ length: 6 }, (_, i) => {
     const year = currentYear - 2 + i;
-    return `${year}/${year + 1}`;
+    const shortYear = year % 100;
+    const nextShortYear = (year + 1) % 100;
+    return `AY${shortYear.toString().padStart(2, '0')}/${nextShortYear.toString().padStart(2, '0')}`;
   });
 
   // Handle generate plan button click
@@ -168,19 +171,22 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
       >
         <div className="w-72 flex flex-col h-full"> {/* Inner fixed width container */}
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-xs font-bold text-slate-500 tracking-widest uppercase">Plan Constraints</h2>
-            <button className="text-slate-400 hover:text-primary hover:rotate-90 transition-all duration-300">
+            <h2 className="text-sm font-bold text-slate-500 tracking-widest uppercase">Academic Plan</h2>
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-slate-400 hover:text-primary hover:rotate-90 transition-all duration-300"
+            >
               <span className="material-symbols-outlined text-[20px]">settings</span>
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-5 space-y-6 custom-scrollbar">
             {/* Form Group */}
             <div className="space-y-4">
-              {/* Academic Year (Start Year) */}
+              {/* Matriculated In (Start Year) */}
               <div className="space-y-1.5 relative">
                 <div className="flex items-center gap-1.5">
-                  <label className="text-xs font-semibold text-slate-700 block">Academic Year (Year 1)</label>
+                  <label className="text-sm font-semibold text-slate-700 block">Matriculated in</label>
                   <button
                     onMouseEnter={() => setShowLockedTooltip('acadYear')}
                     onMouseLeave={() => setShowLockedTooltip(null)}
@@ -213,7 +219,7 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
               {/* Current Semester */}
               <div className="space-y-1.5 relative">
                 <div className="flex items-center gap-1.5">
-                  <label className="text-xs font-semibold text-slate-700 block">Current Semester</label>
+                  <label className="text-sm font-semibold text-slate-700 block">Current Semester</label>
                   <button
                     onMouseEnter={() => setShowLockedTooltip('year' as any)}
                     onMouseLeave={() => setShowLockedTooltip(null)}
@@ -249,17 +255,17 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
                 </div>
               </div>
 
-              {/* Degree */}
+              {/* Faculty */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">Degree</label>
+                <label className="text-sm font-semibold text-slate-700 block">Faculty</label>
                 <div className="relative">
                   <select
                     value={degree}
                     onChange={(e) => handleDegreeChange(e.target.value as 'computing' | 'bba')}
                     className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 pr-8 cursor-pointer hover:border-slate-300 transition-colors outline-none font-medium"
                   >
-                    <option value="computing">Bachelor of Computing</option>
-                    <option value="bba">Bachelor of Business Administration</option>
+                    <option value="computing">Computing</option>
+                    <option value="bba">Business</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
                     <span className="material-symbols-outlined text-[20px]">expand_more</span>
@@ -269,7 +275,7 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
 
               {/* Primary Major - Conditional based on degree */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 block">Primary Major</label>
+                <label className="text-sm font-semibold text-slate-700 block">Primary Major</label>
                 <div className="relative">
                   <select
                     value={primaryMajor}
@@ -286,11 +292,11 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
                 </div>
               </div>
 
-              {/* Focus Area / Specialisation */}
+              {/* Focus Area / Specialization */}
               {degree === 'computing' && primaryMajor === 'Computer Science' && (
                 <div className="space-y-1.5 relative">
                   <div className="flex items-center gap-1.5">
-                    <label className="text-xs font-semibold text-slate-700 block">Focus Area</label>
+                    <label className="text-sm font-semibold text-slate-700 block">Focus Area / Specialization</label>
                     <button
                       onMouseEnter={() => setShowLockedTooltip('focusArea' as any)}
                       onMouseLeave={() => setShowLockedTooltip(null)}
@@ -325,7 +331,7 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
               {/* Max MCs per Semester */}
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5">
-                  <label className="text-xs font-semibold text-slate-700 block">Max MCs per Semester</label>
+                  <label className="text-sm font-semibold text-slate-700 block">Max MCs per Semester</label>
                   <button
                     onMouseEnter={() => setShowLockedTooltip('maxMCs' as any)}
                     onMouseLeave={() => setShowLockedTooltip(null)}
@@ -339,7 +345,7 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <input
                     type="number"
                     min="16"
@@ -347,25 +353,25 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
                     step="4"
                     value={maxMCs}
                     onChange={(e) => setMaxMCs(parseInt(e.target.value) || 20)}
-                    className="w-20 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 text-center font-bold outline-none hover:border-slate-300 transition-colors"
+                    className="w-16 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2 text-center font-bold outline-none hover:border-slate-300 transition-colors"
                   />
                   <span className="text-xs text-slate-500">MCs</span>
-                  <div className="flex gap-1 ml-auto">
+                  <div className="flex gap-0.5 ml-auto">
                     <button
                       onClick={() => setMaxMCs(16)}
-                      className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${maxMCs === 16 ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                      className={`px-1.5 py-1 text-[9px] font-bold rounded transition-colors ${maxMCs === 16 ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                     >
                       Light
                     </button>
                     <button
                       onClick={() => setMaxMCs(20)}
-                      className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${maxMCs === 20 ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                      className={`px-1.5 py-1 text-[9px] font-bold rounded transition-colors ${maxMCs === 20 ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                     >
                       Normal
                     </button>
                     <button
                       onClick={() => setMaxMCs(24)}
-                      className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${maxMCs === 24 ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                      className={`px-1.5 py-1 text-[9px] font-bold rounded transition-colors ${maxMCs === 24 ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                     >
                       Heavy
                     </button>
@@ -431,7 +437,7 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
               {/* Exchange Program */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-700">Exchange Program (SEP)?</label>
+                  <label className="text-sm font-semibold text-slate-700">Going on SEP?</label>
                   <button
                     onClick={() => setHasExchange(!hasExchange)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${hasExchange ? 'bg-green-500' : 'bg-slate-200'}`}
@@ -486,10 +492,10 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
       {/* Full Height Toggle Bar */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`h-full bg-white border-r border-y border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-all duration-300 z-50 focus:outline-none border-l-0 group ${isOpen ? 'w-3.5' : 'w-8'}`}
+        className={`h-full bg-white border-r border-y border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-all duration-300 z-50 focus:outline-none border-l-0 group ${isOpen ? 'w-5' : 'w-8'}`}
         title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
       >
-        <div className="h-12 w-1 bg-slate-300 rounded-full group-hover:bg-slate-400 transition-colors"></div>
+        <span className={`material-symbols-outlined text-slate-400 group-hover:text-slate-600 transition-all text-[16px] ${isOpen ? '' : 'rotate-180'}`}>chevron_left</span>
       </button>
     </div>
   );

@@ -1443,11 +1443,11 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
         </div>
       </div >
 
-      {/* Bottom Part: Staging Area */}
+      {/* Bottom Part: Exempted Courses */}
       < div
         className={`bg-white border-t border-slate-200 shrink-0 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-all duration-300 ease-in-out flex flex-col ${isBottomOpen
-          ? (isBottomExpanded ? 'h-[24rem]' : 'h-64')
-          : 'h-8'
+          ? (isBottomExpanded ? 'h-56' : 'h-40')
+          : 'h-9'
           }`}
       >
         {/* Pull Up Handle with Minimize Button */}
@@ -1457,8 +1457,8 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
         >
           {!isBottomOpen && (
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-slate-400 text-[18px]">layers</span>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Staging Area</span>
+              <span className="material-symbols-outlined text-slate-400 text-[16px]">expand_less</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Exempted Courses</span>
             </div>
           )}
 
@@ -1469,7 +1469,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
                 className="flex items-center justify-center w-12 h-6 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded transition-colors"
                 title="Minimize"
               >
-                <span className="material-symbols-outlined text-[22px]">vertical_align_bottom</span>
+                <span className="material-symbols-outlined text-[16px]">expand_more</span>
               </button>
             )
           }
@@ -1487,15 +1487,12 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
           }
         </div >
 
-        <div className={`p-6 flex-1 overflow-hidden flex flex-col ${!isBottomOpen ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
-          <div className="flex justify-between items-center mb-4 shrink-0">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+        <div className={`p-4 flex-1 overflow-hidden flex flex-col ${!isBottomOpen ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+          <div className="flex justify-between items-center mb-3 shrink-0">
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-500">verified</span>
               Exempted Courses
             </h3>
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide bg-slate-100 px-2 py-1 rounded">
-              Total MCs: <span className="text-slate-800 text-xs ml-1">{totalStagedMCs}</span>
-            </div>
           </div>
 
           <div className="flex gap-6 overflow-x-auto pb-4 custom-scrollbar h-full items-start">
@@ -1541,7 +1538,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
                 className="w-32 h-24 border-2 border-slate-300 border-dashed rounded-xl flex flex-col items-center justify-center gap-1 text-slate-400 hover:border-cyan-400 hover:text-cyan-500 hover:bg-cyan-50/10 transition-all cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[20px]">add_circle</span>
-                <span className="text-[10px] font-bold">Add Exempted</span>
+                <span className="text-xs font-bold">Add Exemption</span>
               </button>
             </div>
           </div>

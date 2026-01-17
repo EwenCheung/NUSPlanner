@@ -12,14 +12,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              primary: '#003D7C', // NUS Navy
-              accent: '#EF7C00',  // NUS Orange
+              primary: '#EF7C00',  // NUS Orange (for onboarding buttons)
+              accent: '#EF7C00',   // NUS Orange
+              'nus-blue': '#003D7C', // NUS Navy (for branding panel)
+              'nus-navy': '#003D7C', // Alias for compatibility
+              'background-light': '#f8f7f5',
+              'background-dark': '#121212',
               slate: {
                 50: '#f8fafc',
                 100: '#f1f5f9',
@@ -35,6 +39,7 @@
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+              display: ['Inter', 'sans-serif'],
             },
             backgroundImage: {
               'grid-pattern': "radial-gradient(circle, #cbd5e1 1px, transparent 1px)",
@@ -47,6 +52,14 @@
       }
     </script>
     <style>
+      /* Select dropdown arrow for onboarding form */
+      .select-custom-arrow {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.5rem;
+      }
       /* Custom Scrollbar */
       .custom-scrollbar::-webkit-scrollbar {
         width: 6px;

@@ -108,6 +108,20 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>(DEFAULT_PLAN);
   const [loading, setLoading] = useState(false);
 
+  // Helper to parse academic year from both formats: "AY24/25" or "2024/2025"
+  const parseAcademicYear = (ayString: string): number => {
+    // Handle "AY24/25" format
+    if (ayString.startsWith('AY')) {
+      const yearPart = ayString.substring(2).split('/')[0];
+      const year = parseInt(yearPart);
+      // Convert 2-digit year to 4-digit (assuming 2000s)
+      return isNaN(year) ? 2024 : (year < 100 ? 2000 + year : year);
+    }
+    // Handle "2024/2025" format
+    const year = parseInt(ayString.split('/')[0]);
+    return isNaN(year) ? 2024 : year;
+  };
+
   // Parse currentSemester (e.g., "Y2S1" -> year 2, sem 1)
   const { currentYearNum, currentSemNum } = useMemo(() => {
     // Handle Incoming Freshman case (Y0S0) - all semesters are future
@@ -139,7 +153,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
 
   // Update academic year labels when startAcademicYear changes
   useEffect(() => {
-    const startYear = parseInt(startAcademicYear.split('/')[0]);
+    const startYear = parseAcademicYear(startAcademicYear);
     setAcademicYears(prev => prev.map((year, idx) => ({
       ...year,
       academicYear: `${startYear + idx}/${startYear + idx + 1}`
@@ -168,7 +182,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
   useEffect(() => {
     if (generatedPlan && generatedPlan.success && generatedPlan.plan) {
       const plan = generatedPlan.plan;
-      const startYear = parseInt(startAcademicYear.split('/')[0]);
+      const startYear = parseAcademicYear(startAcademicYear);
 
       // Convert generated plan format to academicYears format
       const newAcademicYears: AcademicYear[] = [1, 2, 3, 4].map((yearNum) => {
@@ -580,7 +594,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
     setDraggingModule({ code: moduleCode, source, sourceId });
     e.dataTransfer.setData('text/plain', moduleCode);
     e.dataTransfer.effectAllowed = 'move';
-    
+
     // Create a translucent drag image
     const dragElement = e.currentTarget as HTMLElement;
     const clone = dragElement.cloneNode(true) as HTMLElement;
@@ -610,12 +624,12 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
-    
+
     // Determine if we should insert before or after this module
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const midpoint = rect.top + rect.height / 2;
     const insertIndex = e.clientY < midpoint ? index : index + 1;
-    
+
     setDragOverSemId(semId);
     setDragOverIndex(insertIndex);
   };
@@ -1014,7 +1028,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
     <main className="flex-1 flex flex-col bg-slate-50 overflow-hidden relative">
 
       {/* Progression Dashboard */}
-      <div 
+      <div
         style={{ height: !isProgressionOpen ? 44 : (isProgressionExpanded ? progressionHeight : 'auto') }}
         className="bg-white border-b border-slate-200 shadow-sm shrink-0 z-10 flex flex-col transition-all duration-100 ease-out"
       >
@@ -1095,115 +1109,115 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
             <div className="px-8 pb-2 pt-2 border-t border-slate-50 animate-in slide-in-from-top-2 fade-in duration-200 flex-1 overflow-hidden">
               <div className="flex gap-6 overflow-x-auto h-full custom-scrollbar snap-x">
                 {REQUIREMENTS.map((category, idx) => {
-                const fulfilledCount = category.courses.filter(c => checkRequirement(c.code)).length;
-                const isBreadthDepth = category.category.includes('Breadth');
+                  const fulfilledCount = category.courses.filter(c => checkRequirement(c.code)).length;
+                  const isBreadthDepth = category.category.includes('Breadth');
 
-                return (
-                  <div key={idx} className="space-y-3 min-w-[280px] max-w-[280px] snap-start">
-                    <div className="flex items-center justify-between sticky top-0 bg-white z-10">
-                      <div className="flex items-center gap-1.5">
-                        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide truncate" title={category.category}>{category.category}</h4>
-                        {isBreadthDepth && (
-                          <div className="relative group">
-                            <button className="text-slate-400 hover:text-primary">
-                              <span className="material-symbols-outlined text-[14px]">info</span>
-                            </button>
-                            <div className="absolute left-0 top-full mt-2 bg-slate-800 text-white text-xs p-3 rounded-lg shadow-lg z-50 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                              <p className="font-bold mb-2">CS Degree Notes:</p>
-                              <ul className="space-y-1.5 list-disc pl-3 text-[11px]">
-                                <li>Industry Experience & FYP not tracked here (self-check)</li>
-                                <li>6-12 units of Industry Experience required</li>
-                                <li>GPA &gt; 4.0 can use <strong>CP4101</strong> to replace Industry Exp.</li>
-                                <li>GPA &gt; 4.5 for Highest Distinction must take <strong>CP4101</strong></li>
-                                <li>At most 12 units of CP modules</li>
-                                <li>Focus Area: 12 units, one 4K, 2 from list</li>
-                              </ul>
+                  return (
+                    <div key={idx} className="space-y-3 min-w-[280px] max-w-[280px] snap-start">
+                      <div className="flex items-center justify-between sticky top-0 bg-white z-10">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide truncate" title={category.category}>{category.category}</h4>
+                          {isBreadthDepth && (
+                            <div className="relative group">
+                              <button className="text-slate-400 hover:text-primary">
+                                <span className="material-symbols-outlined text-[14px]">info</span>
+                              </button>
+                              <div className="absolute left-0 top-full mt-2 bg-slate-800 text-white text-xs p-3 rounded-lg shadow-lg z-50 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                                <p className="font-bold mb-2">CS Degree Notes:</p>
+                                <ul className="space-y-1.5 list-disc pl-3 text-[11px]">
+                                  <li>Industry Experience & FYP not tracked here (self-check)</li>
+                                  <li>6-12 units of Industry Experience required</li>
+                                  <li>GPA &gt; 4.0 can use <strong>CP4101</strong> to replace Industry Exp.</li>
+                                  <li>GPA &gt; 4.5 for Highest Distinction must take <strong>CP4101</strong></li>
+                                  <li>At most 12 units of CP modules</li>
+                                  <li>Focus Area: 12 units, one 4K, 2 from list</li>
+                                </ul>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">{fulfilledCount}/{category.courses.length}</span>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">{fulfilledCount}/{category.courses.length}</span>
-                    </div>
-                    <div className="space-y-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-1">
-                      {category.courses.map((course) => {
-                        const isDone = checkRequirement(course.code);
+                      <div className="space-y-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-1">
+                        {category.courses.map((course) => {
+                          const isDone = checkRequirement(course.code);
 
-                        // Helper for fuzzy matching in plan
-                        const getBaseCode = (c: string) => {
-                          const match = c.match(/^([A-Z]{2,4}\d{4})/);
-                          return match ? match[1] : c;
-                        };
-                        const courseBase = getBaseCode(course.code);
+                          // Helper for fuzzy matching in plan
+                          const getBaseCode = (c: string) => {
+                            const match = c.match(/^([A-Z]{2,4}\d{4})/);
+                            return match ? match[1] : c;
+                          };
+                          const courseBase = getBaseCode(course.code);
 
-                        const currentSemId = currentYearNum * 10 + currentSemNum;
+                          const currentSemId = currentYearNum * 10 + currentSemNum;
 
-                        // Helper to strictly check if module is in a specific semester
-                        const semContainsCourse = (sem: any) => {
-                          return sem.modules.some((m: any) => {
-                            const mBase = getBaseCode(m.code);
-                            return mBase === courseBase || (course.code.endsWith('%') && m.code.startsWith(course.code.slice(0, -1)));
-                          });
-                        };
+                          // Helper to strictly check if module is in a specific semester
+                          const semContainsCourse = (sem: any) => {
+                            return sem.modules.some((m: any) => {
+                              const mBase = getBaseCode(m.code);
+                              return mBase === courseBase || (course.code.endsWith('%') && m.code.startsWith(course.code.slice(0, -1)));
+                            });
+                          };
 
-                        // Check if course is in strict future semesters (semID > currentSemId)
-                        const isInFuturePlan = !isDone && academicYears.some(year =>
-                          year.semesters.some(sem => {
-                            const semId = year.year * 10 + (sem.name.includes('1') ? 1 : 2);
-                            return semId > currentSemId && semContainsCourse(sem);
-                          })
-                        );
-                        // Check if course is in strictly current semester
-                        const isInCurrentYear = !isDone && academicYears.some(year =>
-                          year.semesters.some(sem => {
-                            const semId = year.year * 10 + (sem.name.includes('1') ? 1 : 2);
-                            return semId === currentSemId && semContainsCourse(sem);
-                          })
-                        );
+                          // Check if course is in strict future semesters (semID > currentSemId)
+                          const isInFuturePlan = !isDone && academicYears.some(year =>
+                            year.semesters.some(sem => {
+                              const semId = year.year * 10 + (sem.name.includes('1') ? 1 : 2);
+                              return semId > currentSemId && semContainsCourse(sem);
+                            })
+                          );
+                          // Check if course is in strictly current semester
+                          const isInCurrentYear = !isDone && academicYears.some(year =>
+                            year.semesters.some(sem => {
+                              const semId = year.year * 10 + (sem.name.includes('1') ? 1 : 2);
+                              return semId === currentSemId && semContainsCourse(sem);
+                            })
+                          );
 
-                        const bgClass = isDone
-                          ? 'bg-green-50/50 border-green-100'
-                          : isInCurrentYear
-                            ? 'bg-blue-50/50 border-blue-100'
-                            : isInFuturePlan
-                              ? 'bg-amber-50/50 border-amber-100'
-                              : 'bg-white border-slate-100';
+                          const bgClass = isDone
+                            ? 'bg-green-50/50 border-green-100'
+                            : isInCurrentYear
+                              ? 'bg-blue-50/50 border-blue-100'
+                              : isInFuturePlan
+                                ? 'bg-amber-50/50 border-amber-100'
+                                : 'bg-white border-slate-100';
 
-                        const iconClass = isDone
-                          ? 'bg-green-500 text-white'
-                          : isInCurrentYear
-                            ? 'bg-blue-500 text-white'
-                            : isInFuturePlan
-                              ? 'bg-amber-400 text-white'
-                              : 'bg-slate-100 border border-slate-300';
+                          const iconClass = isDone
+                            ? 'bg-green-500 text-white'
+                            : isInCurrentYear
+                              ? 'bg-blue-500 text-white'
+                              : isInFuturePlan
+                                ? 'bg-amber-400 text-white'
+                                : 'bg-slate-100 border border-slate-300';
 
-                        const textClass = isDone
-                          ? 'text-slate-700'
-                          : isInCurrentYear
-                            ? 'text-blue-700'
-                            : isInFuturePlan
-                              ? 'text-amber-700'
-                              : 'text-slate-500';
+                          const textClass = isDone
+                            ? 'text-slate-700'
+                            : isInCurrentYear
+                              ? 'text-blue-700'
+                              : isInFuturePlan
+                                ? 'text-amber-700'
+                                : 'text-slate-500';
 
-                        return (
-                          <div key={course.code} className={`flex items-start gap-2.5 p-2 rounded-lg border ${bgClass}`}>
-                            <div className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${iconClass}`}>
-                              {isDone && <span className="material-symbols-outlined text-[12px]">check</span>}
-                              {isInCurrentYear && !isDone && <span className="material-symbols-outlined text-[10px]">play_arrow</span>}
-                              {isInFuturePlan && <span className="material-symbols-outlined text-[10px]">event</span>}
+                          return (
+                            <div key={course.code} className={`flex items-start gap-2.5 p-2 rounded-lg border ${bgClass}`}>
+                              <div className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${iconClass}`}>
+                                {isDone && <span className="material-symbols-outlined text-[12px]">check</span>}
+                                {isInCurrentYear && !isDone && <span className="material-symbols-outlined text-[10px]">play_arrow</span>}
+                                {isInFuturePlan && <span className="material-symbols-outlined text-[10px]">event</span>}
+                              </div>
+                              <div className="min-w-0">
+                                <div className={`text-xs font-bold ${textClass}`}>{course.code}</div>
+                                <div className="text-[10px] text-slate-400 truncate" title={course.title}>{course.title}</div>
+                              </div>
                             </div>
-                            <div className="min-w-0">
-                              <div className={`text-xs font-bold ${textClass}`}>{course.code}</div>
-                              <div className="text-[10px] text-slate-400 truncate" title={course.title}>{course.title}</div>
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </div>
-          </div>
             {/* Resize Handle */}
             <div
               onMouseDown={handleProgressionResize}
@@ -1363,7 +1377,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
                                     </div>
                                   </div>
                                 )}
-                                
+
                                 <div
                                   draggable="true"
                                   onDragStart={(e) => handleDragStart(e, mod.code, 'semester', sem.id)}
@@ -1371,15 +1385,14 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
                                   onDragOver={(e) => handleDragOverModule(e, sem.id, modIndex)}
                                   onDrop={(e) => handleDrop(e, sem.id, dragOverIndex ?? undefined)}
                                   onClick={() => setSelectedModuleCode(mod.code)}
-                                  className={`bg-white p-4 rounded-xl border-[3px] shadow-sm transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] group ${
-                                    draggingModule?.code === mod.code ? 'opacity-50 scale-95' : ''
-                                  } ${cardBorderClass}`}
+                                  className={`bg-white p-4 rounded-xl border-[3px] shadow-sm transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] group ${draggingModule?.code === mod.code ? 'opacity-50 scale-95' : ''
+                                    } ${cardBorderClass}`}
                                   title={combinedErrorMessage}
                                 >
                                   {/* Top Row: Module Code, MCs Badge, Delete Button, Drag Handle */}
                                   <div className="flex items-center justify-between gap-2 mb-2">
                                     <div className={`text-base font-bold ${hasError ? 'text-red-700' : 'text-slate-800'}`}>{mod.code}</div>
-                                    
+
                                     <div className="flex items-center gap-2">
                                       {hasError && (
                                         <span className="material-symbols-outlined text-red-500 text-[18px]" title={combinedErrorMessage}>warning</span>
@@ -1411,7 +1424,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
                                         <span className="material-symbols-outlined text-red-400 hover:text-red-600 text-[18px]">close</span>
                                       </button>
                                       {/* Drag Handle */}
-                                      <div 
+                                      <div
                                         className="cursor-grab active:cursor-grabbing p-1 hover:bg-slate-100 rounded transition-colors"
                                         title="Drag to move"
                                       >

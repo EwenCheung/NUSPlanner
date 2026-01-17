@@ -140,6 +140,159 @@ class CoursePlanningAgent:
         except Exception as e:
             return {"error": str(e)}
 
+    # ============== Exchange Module Methods ==============
+    
+    def search_exchange_mappings(self, nus_course: str) -> Dict:
+        """
+        Find partner universities that offer mapping for a specific NUS module.
+        """
+        try:
+            result = self.supabase.table("exchange_modules").select(
+                "partner_univ, faculty, pu_course, pu_course_title, preapproved"
+            ).eq("nus_course", nus_course.upper()).limit(20).execute()
+            
+            if not result.data:
+                return {
+                    "nus_course": nus_course,
+                    "universities": [],
+                    "message": f"No exchange mappings found for {nus_course}"
+                }
+            
+            # Group by university
+            uni_mappings = {}
+            for row in result.data:
+                uni = row["partner_univ"]
+                if uni not in uni_mappings:
+                    uni_mappings[uni] = {
+                        "name": uni,
+                        "faculty": row["faculty"],
+                        "courses": [],
+                        "preapproved": False
+                    }
+                uni_mappings[uni]["courses"].append({
+                    "pu_course": row["pu_course"],
+                    "pu_course_title": row["pu_course_title"]
+                })
+                if row.get("preapproved"):
+                    uni_mappings[uni]["preapproved"] = True
+            
+            return {
+                "nus_course": nus_course,
+                "universities": list(uni_mappings.values()),
+                "count": len(uni_mappings)
+            }
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def get_partner_universities(self, faculty: str = None) -> Dict:
+        """
+        List all partner universities, optionally filtered by faculty.
+        """
+        try:
+            query = self.supabase.table("exchange_modules").select(
+                "partner_univ, faculty, preapproved"
+            )
+            
+            if faculty:
+                query = query.ilike("faculty", f"%{faculty}%")
+            
+            result = query.execute()
+            
+            if not result.data:
+                return {"universities": [], "count": 0}
+            
+            # Aggregate by university
+            uni_stats = {}
+            for row in result.data:
+                uni = row["partner_univ"]
+                if uni not in uni_stats:
+                    uni_stats[uni] = {
+                        "name": uni,
+                        "faculty": row["faculty"],
+                        "course_count": 0,
+                        "preapproved_count": 0
+                    }
+                uni_stats[uni]["course_count"] += 1
+                if row.get("preapproved"):
+                    uni_stats[uni]["preapproved_count"] += 1
+            
+            # Sort by course count
+            universities = sorted(uni_stats.values(), key=lambda x: x["course_count"], reverse=True)[:20]
+            
+            return {
+                "universities": universities,
+                "count": len(uni_stats),
+                "showing": len(universities)
+            }
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def recommend_exchange_university(self, remaining_courses: list, faculty: str = None) -> Dict:
+        """
+        Recommend partner universities based on remaining courses in the study plan.
+        """
+        if not remaining_courses:
+            return {"error": "No remaining courses provided"}
+        
+        try:
+            # Normalize course codes
+            courses = [c.upper() for c in remaining_courses if not c.startswith(("UE-", "ID-", "CD-", "Focus-"))]
+            
+            if not courses:
+                return {"error": "No valid course codes to match"}
+            
+            query = self.supabase.table("exchange_modules").select(
+                "partner_univ, faculty, nus_course, preapproved"
+            ).in_("nus_course", courses)
+            
+            if faculty:
+                query = query.ilike("faculty", f"%{faculty}%")
+            
+            result = query.execute()
+            
+            if not result.data:
+                return {
+                    "recommendations": [],
+                    "message": "No universities found with matching courses"
+                }
+            
+            # Aggregate by university
+            uni_matches = {}
+            for row in result.data:
+                uni = row["partner_univ"]
+                if uni not in uni_matches:
+                    uni_matches[uni] = {
+                        "name": uni,
+                        "faculty": row["faculty"],
+                        "matching_courses": set(),
+                        "preapproved_count": 0
+                    }
+                uni_matches[uni]["matching_courses"].add(row["nus_course"])
+                if row.get("preapproved"):
+                    uni_matches[uni]["preapproved_count"] += 1
+            
+            # Convert to list and sort
+            recommendations = []
+            for uni_data in uni_matches.values():
+                recommendations.append({
+                    "name": uni_data["name"],
+                    "faculty": uni_data["faculty"],
+                    "matching_courses": list(uni_data["matching_courses"]),
+                    "match_count": len(uni_data["matching_courses"]),
+                    "preapproved_count": uni_data["preapproved_count"]
+                })
+            
+            # Sort by match count, then preapproved count
+            recommendations.sort(key=lambda x: (x["match_count"], x["preapproved_count"]), reverse=True)
+            
+            return {
+                "recommendations": recommendations[:10],
+                "total_matched": len(recommendations),
+                "courses_searched": courses
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
     def query_database(self, question: str) -> Dict:
         """
         Text-to-SQL: Generate and execute a safe SQL query based on natural language.
@@ -348,6 +501,9 @@ When you call get_degree_requirements, the "courses" field contains JSON with:
 - Use `get_degree_requirements` when asked about fluff/core/ID/CD/focus areas/requirements
 - Use `search_modules` when asked to find specific topics or module codes
 - Use `get_module_reviews` when asked about workload/difficulty
+- Use `search_exchange_mappings` when asked about exchange/SEP course mappings for a specific module
+- Use `get_partner_universities` when asked to list exchange partner universities
+- Use `recommend_exchange_university` when asked to find best exchange destinations based on remaining courses
 
 ## Current Plan Summary
 {json.dumps(current_plan, indent=2) if current_plan else "No modules planned yet"}
@@ -452,6 +608,50 @@ When you call get_degree_requirements, the "courses" field contains JSON with:
                         "required": ["question"]
                     }
                 }
+            },
+            # Exchange/SEP Tools
+            {
+                "type": "function",
+                "function": {
+                    "name": "search_exchange_mappings",
+                    "description": "Find partner universities that offer course mapping for a specific NUS module. Use when student asks 'which universities can I map CS3230 at?' or 'where can I take CS2100 on exchange?'",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "nus_course": {"type": "string", "description": "NUS module code to find mappings for (e.g. 'CS3230')"}
+                        },
+                        "required": ["nus_course"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_partner_universities",
+                    "description": "List all NUS exchange partner universities with their course mapping counts. Optionally filter by faculty.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "faculty": {"type": "string", "description": "Optional faculty filter (e.g. 'Computing', 'Business')"}
+                        },
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "recommend_exchange_university",
+                    "description": "Recommend the best exchange universities based on remaining courses in the student's plan. Returns universities sorted by number of matching course mappings.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "remaining_courses": {"type": "array", "items": {"type": "string"}, "description": "List of NUS module codes the student still needs to complete"},
+                            "faculty": {"type": "string", "description": "Optional faculty filter"}
+                        },
+                        "required": ["remaining_courses"]
+                    }
+                }
             }
         ]
         
@@ -494,6 +694,12 @@ When you call get_degree_requirements, the "courses" field contains JSON with:
                         result = self.get_module_reviews(args["module_code"])
                     elif func_name == "query_database":
                         result = self.query_database(args["question"])
+                    elif func_name == "search_exchange_mappings":
+                        result = self.search_exchange_mappings(args["nus_course"])
+                    elif func_name == "get_partner_universities":
+                        result = self.get_partner_universities(args.get("faculty"))
+                    elif func_name == "recommend_exchange_university":
+                        result = self.recommend_exchange_university(args["remaining_courses"], args.get("faculty"))
                     elif func_name == "validate_study_plan":
                          pass
                     

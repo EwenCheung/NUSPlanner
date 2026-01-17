@@ -128,6 +128,15 @@ const SidebarRight: React.FC<SidebarRightProps> = ({ isOpen, toggle, currentPlan
         }
     };
 
+    // Clear chat history and conversation summary
+    const handleClearChat = () => {
+        setMessages([
+            { id: Date.now(), role: 'assistant', content: "Hi there! 👋 I'm **Steve**, your AI study planner. How can I help you with your plan today?" }
+        ]);
+        setConversationSummary('');
+        setInputValue('');
+    };
+
     // Resize handler
     const handleMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -170,9 +179,18 @@ const SidebarRight: React.FC<SidebarRightProps> = ({ isOpen, toggle, currentPlan
                             <span className="material-symbols-outlined text-[20px]">smart_toy</span>
                             <h2 className="text-sm font-bold uppercase tracking-wider">AI Assistant</h2>
                         </div>
-                        <button onClick={toggle} className="text-slate-400 hover:text-slate-600 transition-colors">
-                            <span className="material-symbols-outlined text-[20px]">close_fullscreen</span>
-                        </button>
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={handleClearChat}
+                                className="text-slate-400 hover:text-red-500 transition-colors p-1 rounded hover:bg-red-50"
+                                title="Clear chat history"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                            <button onClick={toggle} className="text-slate-400 hover:text-slate-600 transition-colors p-1">
+                                <span className="material-symbols-outlined text-[20px]">close_fullscreen</span>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Chat Content */}

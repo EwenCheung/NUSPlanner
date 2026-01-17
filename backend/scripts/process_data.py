@@ -44,12 +44,13 @@ def generate_summary(module_code: str, reviews: List[str]) -> Dict:
     - **Grading/Scoring**: how people score, bell curve comments.
     - **Pros/Cons**: what is good/bad.
     - **Recommended Semester**: if mentioned (e.g. Sem 1 is better).
-
-    Also extract 5 short tags.
-
+    
+    Do NOT include a "Tags" section in the markdown summary.
+    Instead, extract 5 short tags and put them ONLY in the "tags" JSON array.
+ 
     Return JSON format: 
     {{ 
-      "summary": "Detailed markdown string...", 
+      "summary": "Detailed markdown string (WITHOUT tags section)...", 
       "tags": ["tag1", "tag2", "Heavy Workload"] 
     }}
     
@@ -62,9 +63,35 @@ def generate_summary(module_code: str, reviews: List[str]) -> Dict:
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
-            max_tokens=300
+            max_tokens=1000
         )
         data = json.loads(response.choices[0].message.content)
+        
+        # Ensure keys exist
+        if "tags" not in data:
+            data["tags"] = []
+        if "summary" not in data:
+            data["summary"] = ""
+            
+        # Fallback: Extract tags if they are in the summary but missing from tags list
+        if not data['tags'] and "Tags:" in data['summary']:
+            import re
+            # Try to find "Tags:" list at the end
+            try:
+                # Look for "Tags:" or "## Tags" followed by bullets
+                match = re.search(r'(?:##\s*)?Tags:?(.*?)$', data['summary'], re.DOTALL | re.IGNORECASE)
+                if match:
+                    tag_text = match.group(1)
+                    # Extract items starting with - or *
+                    extracted_tags = re.findall(r'[-*]\s+([^\n]+)', tag_text)
+                    if extracted_tags:
+                        data['tags'] = [t.strip() for t in extracted_tags]
+                        # Optional: Remove tags from summary to avoid duplication? 
+                        # For now keep it as is or remove it. Let's keep it clean.
+                        # data['summary'] = data['summary'].replace(match.group(0), "").strip()
+            except Exception as e:
+                print(f"  Error extracting tags from summary fallback: {e}")
+
         return data
     except Exception as e:
         print(f"Error calling LLM for {module_code}: {e}")
@@ -123,7 +150,8 @@ def process_single_module(module_code: str, skip_summary: bool = False, skip_emb
     # 3. Update DB
     update_data = {
         "attributes": attributes,
-        "sentiment_tags": summary_data['tags']
+        "sentiment_tags": summary_data['tags'],
+        "review_summary": summary_data['summary']
     }
     if embedding:
         update_data["embedding"] = embedding

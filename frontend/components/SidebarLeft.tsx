@@ -196,7 +196,7 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-500 tracking-widest uppercase">Academic Plan</h2>
             <div className="flex items-center gap-1">
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded hover:bg-slate-100"
                 title="Collapse sidebar"
@@ -519,10 +519,10 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ onGeneratePlan, onAcademicYea
       {isOpen ? (
         <div
           onMouseDown={handleMouseDown}
-          className="h-full w-1.5 bg-slate-200 hover:bg-primary cursor-ew-resize flex items-center justify-center transition-colors group"
+          className="h-full w-3 bg-slate-100 hover:bg-primary/10 cursor-ew-resize flex items-center justify-center transition-colors group border-l border-slate-200"
           title="Drag to resize"
         >
-          <div className="w-0.5 h-8 bg-slate-400 rounded-full group-hover:bg-white transition-colors"></div>
+          <div className="w-1 h-12 bg-slate-300 rounded-full group-hover:bg-primary transition-colors"></div>
         </div>
       ) : (
         <button

@@ -1221,10 +1221,10 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
             {/* Resize Handle */}
             <div
               onMouseDown={handleProgressionResize}
-              className="h-1.5 w-full bg-slate-200 hover:bg-primary cursor-ns-resize flex items-center justify-center transition-colors group shrink-0"
+              className="h-3 w-full bg-slate-100 hover:bg-primary/10 cursor-ns-resize flex items-center justify-center transition-colors group shrink-0 border-t border-slate-200"
               title="Drag to resize"
             >
-              <div className="h-0.5 w-8 bg-slate-400 rounded-full group-hover:bg-white transition-colors"></div>
+              <div className="h-1 w-12 bg-slate-300 rounded-full group-hover:bg-primary transition-colors"></div>
             </div>
           </div>
         )}
@@ -1651,50 +1651,50 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
         {isBottomOpen && !isBottomExpanded && (
           <div
             onMouseDown={handleBottomResize}
-            className="h-1.5 w-full bg-slate-200 hover:bg-primary cursor-ns-resize flex items-center justify-center transition-colors group shrink-0"
+            className="h-3 w-full bg-slate-100 hover:bg-primary/10 cursor-ns-resize flex items-center justify-center transition-colors group shrink-0 border-b border-slate-200"
             title="Drag to resize"
           >
-            <div className="h-0.5 w-8 bg-slate-400 rounded-full group-hover:bg-white transition-colors"></div>
+            <div className="h-1 w-12 bg-slate-300 rounded-full group-hover:bg-primary transition-colors"></div>
           </div>
         )}
 
         {/* Header with Minimize/Expand Buttons */}
         <div
-          className={`h-8 flex items-center justify-center relative bg-slate-50 border-b border-slate-200 transition-colors group shrink-0 ${!isBottomOpen ? 'cursor-pointer hover:bg-slate-100' : ''}`}
+          className={`h-10 flex items-center justify-center relative bg-slate-50 border-b border-slate-200 transition-colors group shrink-0 ${!isBottomOpen ? 'cursor-pointer hover:bg-slate-100' : ''}`}
           onClick={() => !isBottomOpen && setIsBottomOpen(true)}
         >
           {!isBottomOpen && (
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-slate-400 text-[16px]">expand_less</span>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Exempted Courses</span>
+              <span className="material-symbols-outlined text-slate-400 text-[18px]">expand_less</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Exempted Courses</span>
             </div>
           )}
 
           {isBottomOpen && (
             <button
               onClick={(e) => { e.stopPropagation(); setIsBottomOpen(false); }}
-              className="flex items-center justify-center w-12 h-6 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded transition-colors"
+              className="flex items-center justify-center w-12 h-8 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded transition-colors"
               title="Minimize"
             >
-              <span className="material-symbols-outlined text-[16px]">expand_more</span>
+              <span className="material-symbols-outlined text-[20px]">expand_more</span>
             </button>
           )}
 
           {isBottomOpen && (
             <button
               onClick={(e) => { e.stopPropagation(); setIsBottomExpanded(!isBottomExpanded); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-slate-500 rounded hover:bg-slate-200/50 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-300 hover:text-slate-500 rounded hover:bg-slate-200/50 transition-colors"
               title={isBottomExpanded ? "Restore Height" : "Maximize Height"}
             >
-              <span className="material-symbols-outlined text-[18px]">{isBottomExpanded ? 'unfold_less' : 'unfold_more'}</span>
+              <span className="material-symbols-outlined text-[20px]">{isBottomExpanded ? 'unfold_less' : 'unfold_more'}</span>
             </button>
           )}
         </div>
 
-        <div className={`p-4 flex-1 overflow-hidden flex flex-col ${!isBottomOpen ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
-          <div className="flex justify-between items-center mb-3 shrink-0">
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-              <span className="material-symbols-outlined text-cyan-500">verified</span>
+        <div className={`p-6 flex-1 overflow-hidden flex flex-col ${!isBottomOpen ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+          <div className="flex justify-between items-center mb-4 shrink-0">
+            <h3 className="text-base font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <span className="material-symbols-outlined text-cyan-500 text-[24px]">verified</span>
               Exempted Courses
             </h3>
           </div>
@@ -1704,7 +1704,7 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
             {stagedModules.map(mod => (
               <div
                 key={mod.id}
-                className="w-40 h-24 shrink-0 border border-cyan-200 border-b-4 border-b-cyan-400 rounded-xl bg-white flex flex-col items-center justify-center gap-0.5 shadow-sm transition-all relative group"
+                className="w-48 h-32 shrink-0 border border-cyan-200 border-b-4 border-b-cyan-400 rounded-xl bg-white flex flex-col items-center justify-center gap-1 shadow-sm transition-all relative group"
               >
                 {/* Delete button */}
                 <button
@@ -1713,14 +1713,14 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
                     setStagedModules(prev => prev.filter(m => m.id !== mod.id));
                     showToast(`${mod.code} removed from exempted courses`, 'success');
                   }}
-                  className="absolute top-1 right-1 p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+                  className="absolute top-2 right-2 p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
                   title="Remove exempted course"
                 >
-                  <span className="material-symbols-outlined text-[14px]">close</span>
+                  <span className="material-symbols-outlined text-[16px]">close</span>
                 </button>
-                <div className="text-xs font-bold text-slate-800">{mod.code}</div>
-                <div className="text-[9px] font-medium text-cyan-600">Exempted</div>
-                <div className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 mt-0.5">{mod.mcs} MCs</div>
+                <div className="text-base font-bold text-slate-800">{mod.code}</div>
+                <div className="text-xs font-medium text-cyan-600">Exempted</div>
+                <div className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-500 mt-1">{mod.mcs} MCs</div>
               </div>
             ))}
 
@@ -1728,10 +1728,10 @@ const MainBoard: React.FC<MainBoardProps> = ({ refreshTrigger = 0, saveTrigger =
             <div className="relative h-32 shrink-0">
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="w-32 h-24 border-2 border-slate-300 border-dashed rounded-xl flex flex-col items-center justify-center gap-1 text-slate-400 hover:border-cyan-400 hover:text-cyan-500 hover:bg-cyan-50/10 transition-all cursor-pointer"
+                className="w-40 h-32 border-2 border-slate-300 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-cyan-400 hover:text-cyan-500 hover:bg-cyan-50/10 transition-all cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[20px]">add_circle</span>
-                <span className="text-xs font-bold">Add Exemption</span>
+                <span className="material-symbols-outlined text-[24px]">add_circle</span>
+                <span className="text-sm font-bold">Add Exemption</span>
               </button>
             </div>
           </div>

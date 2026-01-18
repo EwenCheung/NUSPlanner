@@ -25,6 +25,7 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
     major: '',
     focusArea: ''
   });
+  const [showMajorTooltip, setShowMajorTooltip] = useState(false);
 
   // Reset major and focus area if faculty changes
   useEffect(() => {
@@ -62,7 +63,7 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       // Map form data to backend's expected format
       const request: GeneratePlanRequest = {
@@ -75,7 +76,7 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
 
       // Generate plan using backend
       const result = await generatePlan(request);
-      
+
       if (result.success) {
         // Save the generated plan to database
         await savePlan(
@@ -86,7 +87,7 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
           'My Plan',
           userId
         );
-        
+
         onComplete(result);
       } else {
         alert(result.message || 'Failed to generate plan. Please try again.');
@@ -171,7 +172,7 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <label className="text-slate-800 dark:text-white text-sm font-semibold font-display">Matriculated in</label>
-              <select 
+              <select
                 name="matricYear"
                 required
                 value={formData.matricYear}
@@ -189,7 +190,7 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
 
             <div className="flex flex-col gap-2">
               <label className="text-slate-800 dark:text-white text-sm font-semibold font-display">Expected Graduation Year</label>
-              <select 
+              <select
                 name="gradYear"
                 required
                 value={formData.gradYear}
@@ -208,7 +209,7 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
 
             <div className="flex flex-col gap-2">
               <label className="text-slate-800 dark:text-white text-sm font-semibold font-display">Faculty</label>
-              <select 
+              <select
                 name="faculty"
                 required
                 value={formData.faculty}
@@ -221,9 +222,24 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
               </select>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-slate-800 dark:text-white text-sm font-semibold font-display">Primary Major</label>
-              <select 
+            <div className="flex flex-col gap-2 relative">
+              <div className="flex items-center gap-2">
+                <label className="text-slate-800 dark:text-white text-sm font-semibold font-display">Primary Major</label>
+                <button
+                  type="button"
+                  onMouseEnter={() => setShowMajorTooltip(true)}
+                  onMouseLeave={() => setShowMajorTooltip(false)}
+                  className="text-slate-400 hover:text-slate-500"
+                >
+                  <span className="material-symbols-outlined text-[16px]">info</span>
+                </button>
+                {showMajorTooltip && (
+                  <div className="absolute left-0 bottom-full mb-2 bg-slate-800 text-white text-xs p-3 rounded-lg shadow-lg z-50 w-64 animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
+                    <p>Due to data access limitations, we currently only have manual data for selected majors.</p>
+                  </div>
+                )}
+              </div>
+              <select
                 name="major"
                 required
                 disabled={!formData.faculty}
@@ -232,15 +248,20 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
                 className="select-custom-arrow flex w-full rounded-lg text-slate-700 dark:text-slate-200 focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 h-14 p-4 text-base font-normal font-display disabled:opacity-50"
               >
                 <option value="" disabled>Select major</option>
-                {formData.faculty && majorOptions[formData.faculty].map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
+                {formData.faculty && majorOptions[formData.faculty].map(opt => {
+                  const isAllowed = ['Computer Science', 'Business Analytics', 'Finance', 'Accountancy'].includes(opt);
+                  return (
+                    <option key={opt} value={opt} disabled={!isAllowed}>
+                      {isAllowed ? opt : `🔒 ${opt}`}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-slate-800 dark:text-white text-sm font-semibold font-display">Focus Area / Specialization</label>
-              <select 
+              <select
                 name="focusArea"
                 value={formData.focusArea}
                 onChange={handleInputChange}
@@ -256,9 +277,9 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
             </div>
 
             <div className="pt-4 flex flex-col items-center gap-4">
-              <button 
+              <button
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg h-14 px-6 bg-primary text-white text-lg font-bold transition-all hover:bg-[#d67000] hover:shadow-lg active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed" 
+                className="flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg h-14 px-6 bg-primary text-white text-lg font-bold transition-all hover:bg-[#d67000] hover:shadow-lg active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 type="submit"
               >
                 {loading ? (
@@ -270,7 +291,7 @@ const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({ userId, onComplet
                   <span>Generate Study Plan</span>
                 )}
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={handleSkip}
                 className="text-primary font-bold underline text-sm hover:text-[#d67000] transition-colors"

@@ -136,25 +136,25 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
         courses.append(Course("GEN", "Communities and Engagement", 4, "CC-UP", [], [], [], fluff=True))
 
         # ============== CORE - BUSINESS ==============
-        courses.append(Course("ACC1701", "Accounting for Decision Makers", 4, "Core", [], [], []))
-        courses.append(Course("MKT1705", "Principles of Marketing", 4, "Core", [], [], []))
-        courses.append(Course("MNO1706", "Organisational Behaviour", 4, "Core", [], [], []))
+        courses.append(Course("ACC1701A", "Accounting for Decision Makers", 4, "Core", [], [], []))
+        courses.append(Course("MKT1705A", "Principles of Marketing", 4, "Core", [], [], []))
+        courses.append(Course("MNO1706A", "Organisational Behaviour", 4, "Core", [], [], []))
         courses.append(Course("DAO2702", "Programming for Business Analytics", 4, "Core", [], [], []))
         courses.append(Course("DAO2703", "Operations & Technology Management", 4, "Core", [], [], []))
-        courses.append(Course("FIN2704", "Finance", 4, "Core", ["ACC1701"], [], []))
+        courses.append(Course("FIN2704", "Finance", 4, "Core", ["ACC1701A"], [], []))
         courses.append(Course("RE1702", "Real Estate Data Analytics", 4, "ACC-Core", ["RE1703"], [], []))
 
         # ============== ACCOUNTANCY MAJOR – COMPULSORY COURSES ==============
-        courses.append(Course("ACC2706", "Managerial Accounting", 4, "ACC-Core", ["ACC1701"], [], []))
-        courses.append(Course("ACC2707", "Corporate Accounting & Reporting I", 4, "ACC-Core", ["ACC1701"], [], []))
+        courses.append(Course("ACC2706", "Managerial Accounting", 4, "ACC-Core", ["ACC1701A"], [], []))
+        courses.append(Course("ACC2707", "Corporate Accounting & Reporting I", 4, "ACC-Core", ["ACC1701A"], [], []))
         courses.append(Course("ACC2708", "Corporate Accounting & Reporting II", 4, "ACC-Core", ["ACC2707"], [], []))
-        courses.append(Course("ACC2727", "Business Processes, Systems and Assurance – Foundation", 4, "ACC-Core", ["ACC1701"], [], []))
+        courses.append(Course("ACC2727", "Business Processes, Systems and Assurance – Foundation", 4, "ACC-Core", ["ACC1701A"], [], []))
         courses.append(Course("ACC3702", "Corporate and Securities Law", 4, "ACC-Core", ["GESS1018", "RE2702"], [], []))
         courses.append(Course("RE2702", "Land Law", 4, "ACC-Core", ["RE1702"], [], []))
-        courses.append(Course("ACC3703", "Taxation", 4, "ACC-Core", ["ACC1701", "BSP1702"], [], []))
+        courses.append(Course("ACC3703", "Taxation", 4, "ACC-Core", ["ACC1701A", "BSP1702"], [], []))
         courses.append(Course("ACC3706", "Governance, Risk Management and Sustainability", 4, "ACC-Core", ["ACC2727"], [], []))
         courses.append(Course("ACC3727", "Business Processes, Systems and Assurance – Advanced", 4, "ACC-Core", ["ACC2727"], [], []))
-        courses.append(Course("MNO2705", "Leadership and Decision Making under Uncertainty", 4, "ACC-Core", ["MNO1706"], [], []))
+        courses.append(Course("MNO2705A", "Leadership and Decision Making under Uncertainty", 4, "ACC-Core", ["MNO1706A"], [], []))
 
         # ============== ACCOUNTANCY CAPSTONE & ADVANCED COURSES ==============
         courses.append(Course(
@@ -184,32 +184,32 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
         courses.append(Course("GEN", "Communities and Engagement", 4, "CC-UP", [], [], [], fluff=True))
 
         # ============== CORE - BUSINESS ==============
-        courses.append(Course("ACC1701", "Accounting for Decision Makers", 4, "Core", [], [], []))
-        courses.append(Course("MKT1705", "Principles of Marketing", 4, "Core", [], [], []))
-        courses.append(Course("MNO1706", "Organisational Behaviour", 4, "Core", [], [], []))
+        courses.append(Course("ACC1701A", "Accounting for Decision Makers", 4, "Core", [], [], []))
+        courses.append(Course("MKT1705A", "Principles of Marketing", 4, "Core", [], [], []))
+        courses.append(Course("MNO1706A", "Organisational Behaviour", 4, "Core", [], [], []))
         courses.append(Course("DAO2702", "Programming for Business Analytics", 4, "Core", [], [], []))
         courses.append(Course("DAO2703", "Operations & Technology Management", 4, "Core", [], [], []))
-        courses.append(Course("FIN2704", "Finance", 4, "Core", ["ACC1701"], [], []))
+        courses.append(Course("FIN2704", "Finance", 4, "Core", ["ACC1701A"], [], []))
 
         # ============== FINANCE MAJOR – COMPULSORY COURSES ==============
-        courses.append(Course("FIN3701", "Corporate Finance", 4, "Finance-Core", ["FIN2704"], [], []))
-        courses.append(Course("FIN3702", "Investment Analysis and Portfolio Management", 4, "Finance-Core", ["FIN2704"], [], []))
-        courses.append(Course("FIN3703", "Financial Markets", 4, "Finance-Core", ["FIN2704"], [], []))
-        courses.append(Course("MNO2705", "Leadership and Decision Making under Uncertainty", 4, "Finance-Core", ["MNO1706"], [], []))
+        courses.append(Course("FIN3701A", "Corporate Finance", 4, "Finance-Core", ["FIN2704"], [], []))
+        courses.append(Course("FIN3702A", "Investment Analysis and Portfolio Management", 4, "Finance-Core", ["FIN2704"], [], []))
+        courses.append(Course("FIN3703A", "Financial Markets", 4, "Finance-Core", ["FIN2704"], [], []))
+        courses.append(Course("MNO2705A", "Leadership and Decision Making under Uncertainty", 4, "Finance-Core", ["MNO1706A"], [], []))
         courses.append(Course(
             "BSP4701",
             "Strategic Management (Capstone)",
             4,
             "Finance-Capstone",
-            ["FIN3701", "FIN3702", "FIN3703"],
+            ["FIN3701A", "FIN3702A", "FIN3703A"],
             [],
             []
         ))
 
         # ============== FINANCE MAJOR ELECTIVES (LEVEL 3000) ==============
         # Choose ANY 2
-        courses.append(Course("FIN3712", "Options and Futures", 4, "Finance-Elective-L3", ["FIN3702", "FIN2704"], [], []))
-        courses.append(Course("FIN3716", "Financial Modelling", 4, "Finance-Elective-L3", ["ACC1701", "FIN2704", "FIN3702"], [], []))
+        courses.append(Course("FIN3712", "Options and Futures", 4, "Finance-Elective-L3", ["FIN3702A", "FIN2704"], [], []))
+        courses.append(Course("FIN3716", "Financial Modelling", 4, "Finance-Elective-L3", ["ACC1701", "FIN2704", "FIN3702A"], [], []))
 
         # ============== FINANCE MAJOR ELECTIVES (LEVEL 4000) ==============
         # Choose ANY 2
@@ -218,7 +218,7 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
             "Valuation and Mergers & Acquisition",
             4,
             "Finance-Elective-L4",
-            ["FIN3701", "FIN3702"],
+            ["FIN3701A", "FIN3702A"],
             [],
             []
         ))

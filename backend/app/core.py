@@ -152,7 +152,7 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
         courses.append(Course("ACC3702", "Corporate and Securities Law", 4, "ACC-Core", ["GESS1018", "RE2702"], [], []))
         courses.append(Course("RE2702", "Land Law", 4, "ACC-Core", ["RE1702"], [], []))
         courses.append(Course("ACC3703", "Taxation", 4, "ACC-Core", ["ACC1701A", "BSP1702"], [], []))
-        courses.append(Course("ACC3706", "Governance, Risk Management and Sustainability", 4, "ACC-Core", ["ACC2727"], [], []))
+        courses.append(Course("ACC3706", "Governance, Risk Management and Sustainability", 4, "ACC-Core", ["ACC2727"], ["BSP1702"], []))
         courses.append(Course("ACC3727", "Business Processes, Systems and Assurance – Advanced", 4, "ACC-Core", ["ACC2727"], [], []))
         courses.append(Course("MNO2705A", "Leadership and Decision Making under Uncertainty", 4, "ACC-Core", ["MNO1706A"], [], []))
 
@@ -197,7 +197,7 @@ def get_needed_courses(degree: str, major: str, focus_area: str = "AI") -> List[
         courses.append(Course("FIN3703A", "Financial Markets", 4, "Finance-Core", ["FIN2704"], [], []))
         courses.append(Course("MNO2705A", "Leadership and Decision Making under Uncertainty", 4, "Finance-Core", ["MNO1706A"], [], []))
         courses.append(Course(
-            "BSP4701",
+            "BSP4701A",
             "Strategic Management (Capstone)",
             4,
             "Finance-Capstone",

@@ -17,6 +17,17 @@
 
 NUSPlanner is a full-stack application that automatically generates valid study plans for NUS students. It eliminates the frustration of scattered information across NUSMods, faculty websites, and random PDFs by providing a single unified platform.
 
+## Live Demo Limitations
+
+You can quickly try out the application using the current deployment. However, for a full experience—including full access to the AI Assistant and private data persistence—you will need to clone the project, configure the `.env` variables, and run the data seeding script.
+
+If you would like to see a fully functional demo or need assistance, feel free to contact me via Telegram: **@Ewen_1**
+
+**Note:** Due to free tier limitations and open source security policies in the public deployment:
+- **AI Assistant** is disconnected (requires API Key).
+- **Sign In/Sign Up** is limited (Guest Login recommended).
+- Core features like **Course Planning** and **Reviews** are fully functional.
+
 ### ✨ Key Features
 
 | Feature | Description |

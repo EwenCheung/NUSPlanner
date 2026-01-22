@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { API_BASE_URL } from '../api';
 
 interface SidebarRightProps {
     isOpen: boolean;
@@ -83,7 +84,7 @@ const SidebarRight: React.FC<SidebarRightProps> = ({ isOpen, toggle, currentPlan
 
             const conversationHistory = recentMessages.map(m => ({ role: m.role, content: m.content }));
 
-            const response = await fetch('http://localhost:8000/chat', {
+            const response = await fetch(`${API_BASE_URL}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

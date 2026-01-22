@@ -7,7 +7,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import NewUserOnboarding from './components/NewUserOnboarding';
 import { AcademicYear } from './types';
-import { GeneratePlanResponse, fetchUserPlan } from './api';
+import { GeneratePlanResponse, fetchUserPlan, API_BASE_URL } from './api';
 
 // Types for Auth
 interface User {
@@ -122,7 +122,7 @@ const App: React.FC = () => {
   // Auth Handlers
   const handleLogin = async (email: string, password: string): Promise<string> => {
     try {
-      const response = await fetch('http://localhost:8000/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -138,13 +138,13 @@ const App: React.FC = () => {
           isGuest: false
         };
         setUser(newUser);
-        
+
         // Check if user has existing plan
         const hasPlan = await checkUserPlan(userData.id);
         if (!hasPlan) {
           setShowOnboarding(true);
         }
-        
+
         return ''; // No error
       } else {
         return userData.message || 'Login failed';
@@ -156,7 +156,7 @@ const App: React.FC = () => {
 
   const handleGuestLogin = async () => {
     try {
-      const response = await fetch('http://localhost:8000/auth/guest', {
+      const response = await fetch(`${API_BASE_URL}/auth/guest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -183,7 +183,7 @@ const App: React.FC = () => {
 
   const handleSignup = async (username: string, email: string, password: string): Promise<string> => {
     try {
-      const response = await fetch('http://localhost:8000/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password })
@@ -199,10 +199,10 @@ const App: React.FC = () => {
           isGuest: false
         };
         setUser(newUser);
-        
+
         // New users always need onboarding (they don't have a plan yet)
         setShowOnboarding(true);
-        
+
         return ''; // No error
       } else {
         return userData.message || 'Signup failed';
